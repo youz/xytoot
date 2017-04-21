@@ -80,7 +80,8 @@ xytoot起動時に読み込まれるので、このファイルにユーザー�
 
 Yousuke Ushiki (<citrus.yubeshi@gmail.com>)
 
-[yubeshi@mstdn.jp](http://mstdn.jp/@yubeshi)
+- [youz on mstdn.jp](https://mstdn.jp/@yubeshi)
+- [youz on twitter](https://twitter.com/yubeshi)
 
 
 ## Copyright
