@@ -9,7 +9,7 @@ Mastodon client for xyzzy
 
 2. `*load-path*`にあるディレクトリ(~/site-lisp等)にxytoot.l, xytoot.lcをコピーする。
    あるいは`*load-path*`に取得したフォルダのパスを追加する。
-   (リポジトリをクローンして取得した場合はxytoot.lcが存在しないので、コピー後にM-x byte-compile-fileをして生成しておく。)
+   (リポジトリをクローンして取得した場合はxytoot.lcが存在しないので、コピー後にM-x byte-compile-fileを実行してlcファイルを生成しておく。)
 
 3. `.xyzzy`に`(require "xytoot")`と追記するなどして読み込む。
 
@@ -69,12 +69,13 @@ xytoot起動時に読み込まれるので、このファイルにユーザー�
 - C-c C-k  -- 入力中の文章を破棄して投稿用バッファを閉じる
 
 
-## todo
+## todo/issues
 
 - 投稿時の`sensitive`パラメータ
 - 投稿時の`spoiler`パラメータ
 - Streaming API
-- 
+- Reblog済みかどうか分からない
+- Follow済みかどうか分からない
 
 ## 作者
 
