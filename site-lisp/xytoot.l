@@ -375,7 +375,7 @@
 	 (client-id (getf client :client-id))
 	 (client-secret (getf client :client-secret))
 	 (redirect-uri "urn:ietf:wg:oauth:2.0:oob")
-	 (url (format nil "https://~A/oauth/authorize?client_id=~A&redirect_uri=~A&response_type=code"
+	 (url (format nil "https://~A/oauth/authorize?client_id=~A&redirect_uri=~A&response_type=code&scope=read+write+follow"
 		      host client-id redirect-uri)))
     (shell-execute url t)
     (let* ((code (read-string "authorization code: "))
