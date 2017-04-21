@@ -295,6 +295,7 @@
 	(setq *tokens* (read is nil))))))
 
 (defun write-token-file ()
+  (create-directory "~/.xytoot" :if-exists :skip)
   (let ((tokenfile "~/.xytoot/tokens"))
     (with-open-file (os tokenfile :direction :output
 			:if-exists :supersede
@@ -335,6 +336,7 @@
 	(read is nil)))))
 
 (defun write-client-tokens (tokens)
+  (create-directory "~/.xytoot" :if-exists :skip)
   (let ((tokenfile "~/.xytoot/clients"))
     (with-open-file (os tokenfile :direction :output
 			:if-exists :supersede
@@ -390,6 +392,7 @@
 	(error "authorization failed:~%~S" res))
       (whenlet user (get-username host token)
 	(let ((prf (list :user user :token token)))
+	  (load-token-file)
 	  (setq *tokens* (delete-if (lambda (p) (string= user (getf p :user))) *tokens*))
 	  (push prf *tokens*)
 	  (write-token-file)
@@ -413,6 +416,8 @@
 	  (error "authorization failed:~%~S" res))
 	(whenlet user (get-username host token)
 	  (let ((prf (list :user username :token token)))
+	    (load-token-file)
+	    (setq *tokens* (delete-if (lambda (p) (string= user (getf p :user))) *tokens*))
 	    (push prf *tokens*)
 	    (write-token-file)
 	    prf))))))
@@ -1150,8 +1155,8 @@
 ;;; major mode
 (defun xytoot-init ()
   (unless (or *tokens* (load-token-file))
-    (xytoot-add-user))
-  (when (file-exist-p (merge-pathnames ".xytoot/config.l" (si:system-root)))
+    (user::xytoot-add-user))
+  (when (file-exist-p "~/.xytoot/config.l")
     (load-plugin "config"))
   t)
 
