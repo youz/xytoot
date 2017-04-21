@@ -1409,10 +1409,10 @@
 	       (eq (timeline-entity-type buffer-timeline) :status))
     (return-from delete-status))
   (w/entry (id account.username content)
-    (let ((user (timeline-user buffer-timeline))
-	  (host (username-host user))
-	  (text (html2text content)))
-      (when (y-or-n-p "Delete? ~A:~A ~:[...~;~]"
+    (let* ((user (timeline-user buffer-timeline))
+	   (host (username-host user))
+	   (text (html2text content)))
+      (when (y-or-n-p "Delete? ~A: ~A ~:[...~;~]"
 		      account.username
 		      (subseq text 0 (min #1=(length text) 50))
 		      (< #1# 50))
