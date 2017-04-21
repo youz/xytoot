@@ -395,7 +395,7 @@
 	  (write-token-file)
 	  prf)))))
 
-(defun add-access-token-by-password (host mailaddress password)
+(defun get-access-token-by-password (host mailaddress password)
   (let* ((client (or (get-registered-client host)
 		     (register-application host)))
 	 (client-id (getf client :client-id))
