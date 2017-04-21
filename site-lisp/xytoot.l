@@ -103,7 +103,7 @@
   (define-key m #\D 'delete-status)
   (define-key m '(#\f #\a) 'toggle-favourite)
   (define-key m '(#\r #\b) 'reblog)
-  #+:not-implemented (define-key m '(#\u #\r) 'unreblog)
+  (define-key m '(#\u #\r) 'unreblog)
 
   ;; etc
   (define-key m '(#\f #\o) 'follow-focused-user)
@@ -1380,28 +1380,29 @@
 	       (eq (timeline-entity-type buffer-timeline) :status))
     (return-from reblog))
   (w/entry (id account.username content)
-    (let ((user (timeline-user buffer-timeline)))
-      (when (y-or-n-p "Reblog? ~A:~A ~:[...~;~]"
+    (let ((user (timeline-user buffer-timeline))
+	  (text (html2text content)))
+      (when (y-or-n-p "Reblog? ~A: ~A ~:[...~;~]"
 		      account.username
-		      (subseq content 0 (min #1=(length content) 50))
+		      (subseq text 0 (min #1=(length text) 50))
 		      (< #1# 50))
 	(api-reblog :host (username-host user) :token (find-token user)
 		    :status-id id)))))
 
-;; fixme
 (defun unreblog ()
   (interactive)
   (unless (and (timeline-buffer-p (selected-buffer))
 	       (eq (timeline-entity-type buffer-timeline) :status))
     (return-from unreblog))
   (w/entry (id account.username content)
-    (let ((user (timeline-user buffer-timeline)))
-      (when (y-or-n-p "Unreblog? ~A:~A ~:[...~;~]"
+    (let ((user (timeline-user buffer-timeline))
+	  (text (html2text content)))
+      (when (y-or-n-p "Unreblog? ~A: ~A ~:[...~;~]"
 		      account.username
-		      (subseq content 0 (min #1=(length content) 50))
+		      (subseq text 0 (min #1=(length text) 50))
 		      (< #1# 50))
-	(api-reblog :host (username-host user) :token (find-token user)
-		    :status-id id)))))
+	(api-unreblog :host (username-host user) :token (find-token user)
+		      :status-id id)))))
 
 (defun delete-status ()
   (interactive)
