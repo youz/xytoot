@@ -448,7 +448,9 @@
 	 *default-user*)
 	((= (length *tokens*) 1)
 	 (getf (car *tokens*) :user))
-	(t (select-login-user))))
+	(t (unless (or *tokens* (load-token-file))
+	     (error "Access token not found.\nRun xytoot-add-user"))
+	   (select-login-user))))
 
 
 ;;; API request
@@ -1370,12 +1372,11 @@
 (defun toot ()
   (interactive)
   (unless (xytoot-init) (quit))
-  (unless *default-user*
-    (error "Set xytoot:*default-user* first"))
-  (let ((status (read-status "Toot: ")))
+  (let ((user (select-default-user))
+	(status (read-status "Toot: ")))
     (when (string/= status "")
-      (api-new-status :host (username-host *default-user*)
-		      :token (find-token *default-user*)
+      (api-new-status :host (username-host user)
+		      :token (find-token user)
 		      :status status)
       (timeline-reload))))
 
