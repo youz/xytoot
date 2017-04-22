@@ -1039,12 +1039,12 @@
 
 (defun open-link ()
   (interactive)
-  (let ((login-user (timeline-user buffer-timeline))
+  (let ((host (timeline-host buffer-timeline))
+	(login-user (timeline-user buffer-timeline))
 	(user (focused-user))
 	(tag (focused-hashtag)))
     (cond (user
-	   (let* ((host (username-host login-user))
-		  (user (normalize-user user host))
+	   (let* ((user (normalize-user user host))
 		  (id (or (get-userid-from-current-entry user)
 			  (json-value (search-user user login-user) id))))
 	     (unless id
@@ -1235,7 +1235,7 @@
 	       (unless (eq buffer-mode 'xytoot-timeline-mode)
 		 (xytoot-timeline-mode)
 		 (setf (timeline-mode buffer-timeline) ,(kwd name)
-		       (timeline-user buffer-timeline) ,ghost
+		       (timeline-host buffer-timeline) ,ghost
 		       (timeline-user buffer-timeline) ,login-user
 		       (timeline-apifunc buffer-timeline) #',api-func
 		       (timeline-params buffer-timeline) ,gparams
@@ -1386,13 +1386,14 @@
 	       (eq (timeline-entity-type buffer-timeline) :status))
     (return-from reblog))
   (w/entry (id account.username content)
-    (let ((user (timeline-user buffer-timeline))
+    (let ((host (timeline-host buffer-timeline))
+	  (user (timeline-user buffer-timeline))
 	  (text (html2text content)))
       (when (y-or-n-p "Reblog? ~A: ~A ~:[...~;~]"
 		      account.username
 		      (subseq text 0 (min #1=(length text) 50))
 		      (< #1# 50))
-	(api-reblog :host (username-host user) :token (find-token user)
+	(api-reblog :host host :token (find-token user)
 		    :status-id id)))))
 
 (defun unreblog ()
@@ -1401,13 +1402,14 @@
 	       (eq (timeline-entity-type buffer-timeline) :status))
     (return-from unreblog))
   (w/entry (id account.username content)
-    (let ((user (timeline-user buffer-timeline))
+    (let ((host (timeline-host buffer-timeline))
+	  (user (timeline-user buffer-timeline))
 	  (text (html2text content)))
       (when (y-or-n-p "Unreblog? ~A: ~A ~:[...~;~]"
 		      account.username
 		      (subseq text 0 (min #1=(length text) 50))
 		      (< #1# 50))
-	(api-unreblog :host (username-host user) :token (find-token user)
+	(api-unreblog :host host :token (find-token user)
 		      :status-id id)))))
 
 (defun delete-status ()
@@ -1416,14 +1418,14 @@
 	       (eq (timeline-entity-type buffer-timeline) :status))
     (return-from delete-status))
   (w/entry (id account.username content)
-    (let* ((user (timeline-user buffer-timeline))
-	   (host (username-host user))
-	   (text (html2text content)))
+    (let ((host (timeline-host buffer-timeline))
+	  (user (timeline-user buffer-timeline))
+	  (text (html2text content)))
       (when (y-or-n-p "Delete? ~A: ~A ~:[...~;~]"
 		      account.username
 		      (subseq text 0 (min #1=(length text) 50))
 		      (< #1# 50))
-	(api-delete-status-async :host (username-host user) :token (find-token user)
+	(api-delete-status-async :host host :token (find-token user)
 				 :status-id id)))))
 
 
@@ -1436,6 +1438,7 @@
 	(let ((buf (selected-buffer))
 	      (state (cdr stag))
 	      (mk (make-marker))
+	      (host (timeline-host buffer-timeline))
 	      (user (timeline-user buffer-timeline)))
 	  (set-marker mk sfrom)
 	  (labels ((toggle (s)
@@ -1451,7 +1454,7 @@
 		     (refresh-screen)))
 	    (funcall (if state #'api-unfavourite-async #'api-favourite-async)
 		     :status-id (json-value status id)
-		     :host (username-host user)
+		     :host host
 		     :token (find-token user)
 		     :onsuccess (lambda (res) (toggle (not state)))
 		     :onfailure
@@ -1463,7 +1466,8 @@
   (interactive)
   (unless (timeline-buffer-p (selected-buffer))
     (return-from follow-focused-user))
-  (let ((login-user (timeline-user buffer-timeline)))
+  (let ((host (timeline-host buffer-timeline))
+	(login-user (timeline-user buffer-timeline)))
     (whenlet user (or (focused-user)
 		      (w/entry (account.acct acct)
 			(or account.acct acct)))
@@ -1473,7 +1477,7 @@
 	  (unless id
 	    (error "user-id for ~A not found" user))
 	  (api-follow-async
-	   :host (username-host login-user)
+	   :host host
 	   :token (find-token login-user)
 	   :id id
 	   :onsuccess
@@ -1484,7 +1488,8 @@
   (interactive)
   (unless (timeline-buffer-p (selected-buffer))
     (return-from unfollow-focused-user))
-  (let ((login-user (timeline-user buffer-timeline)))
+  (let ((host (timeline-host buffer-timeline))
+	(login-user (timeline-user buffer-timeline)))
     (whenlet user (or (focused-user)
 		      (w/entry (account.acct acct)
 			(or account.acct acct)))
@@ -1494,7 +1499,7 @@
 	  (unless id
 	    (error "user-id for ~A not found" user))
 	  (api-unfollow-async
-	   :host (username-host login-user)
+	   :host host
 	   :token (find-token login-user)
 	   :id id
 	   :onsuccess
