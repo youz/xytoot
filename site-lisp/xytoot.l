@@ -1259,6 +1259,13 @@
   :api-func api-home-timeline-async
   :entity-type :status)
 
+(define-tl tl-public (login-user local)
+  :login-user login-user
+  :buffer-name (format nil "*~A: ~:[federation~;local~]*" login-user local)
+  :api-func api-public-timeline-async
+  :params (:local local)
+  :entity-type :status)
+
 (define-tl tl-notifications (login-user)
   :login-user login-user
   :buffer-name (format nil "*~A: notifications*" login-user)
@@ -1320,15 +1327,15 @@
   (tl-notifications login-user)
   (move-previous-window))
 
-(defun user::xytoot-search-user (user &optional login-user)
-  (interactive "sUsername: \nP")
+(defun user::xytoot-favourites (&optional login-user)
+  (interactive "P")
   (unless (xytoot-init) (quit))
   (cond
    (*prefix-args*
     (setq login-user (select-login-user)))
    ((null login-user)
     (setq login-user (select-default-user))))
-  (tl-search-accounts user login-user))
+  (tl-favourites login-user))
 
 (defun user::xytoot-search-tag (hashtag &optional login-user)
   (interactive "sHashtag: #\nP")
@@ -1340,7 +1347,7 @@
     (setq login-user (select-default-user))))
   (tl-hashtag hashtag login-user))
 
-(defun user::xytoot-favourites (&optional login-user)
+(defun user::xytoot-local (&optional login-user)
   (interactive "P")
   (unless (xytoot-init) (quit))
   (cond
@@ -1348,8 +1355,37 @@
     (setq login-user (select-login-user)))
    ((null login-user)
     (setq login-user (select-default-user))))
-  (tl-favourites login-user))
+  (tl-public login-user t))
 
+(defun user::xytoot-federation (&optional login-user)
+  (interactive "P")
+  (unless (xytoot-init) (quit))
+  (cond
+   (*prefix-args*
+    (setq login-user (select-login-user)))
+   ((null login-user)
+    (setq login-user (select-default-user))))
+  (tl-public login-user nil))
+
+(defun user::xytoot-search-tag (hashtag &optional login-user)
+  (interactive "sHashtag: #\nP")
+  (unless (xytoot-init) (quit))
+  (cond
+   (*prefix-args*
+    (setq login-user (select-login-user)))
+   ((null login-user)
+    (setq login-user (select-default-user))))
+  (tl-hashtag hashtag login-user))
+
+(defun user::xytoot-search-user (user &optional login-user)
+  (interactive "sUsername: \nP")
+  (unless (xytoot-init) (quit))
+  (cond
+   (*prefix-args*
+    (setq login-user (select-login-user)))
+   ((null login-user)
+    (setq login-user (select-default-user))))
+  (tl-search-accounts user login-user))
 
 
 ;;; actions
