@@ -435,22 +435,23 @@
 		   :default (username-host *default-user*)
 		   :must-match t))
 
-(defun select-login-user (&optional (prompt "Select login user: "))
-  (completing-read prompt
-		   (mapcar #'(lambda (p) (getf p :user))
-			   (or *tokens* (load-token-file)))
+(defun select-login-user ()
+  (unless (or *tokens* (load-token-file))
+    (error "Access token not found.\nRun xytoot-add-user"))
+  (completing-read "Select login user: "
+		   (mapcar #'(lambda (p) (getf p :user)) *tokens*)
 		   :case-fold nil
 		   :default *default-user*
 		   :must-match t))
 
 (defun select-default-user ()
+  (unless (or *tokens* (load-token-file))
+    (error "Access token not found.\nRun xytoot-add-user"))
   (cond (*default-user*
 	 *default-user*)
 	((= (length *tokens*) 1)
 	 (getf (car *tokens*) :user))
-	(t (unless (or *tokens* (load-token-file))
-	     (error "Access token not found.\nRun xytoot-add-user"))
-	   (select-login-user))))
+	(t (select-login-user))))
 
 
 ;;; API request
