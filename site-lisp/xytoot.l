@@ -1263,7 +1263,7 @@
   :login-user login-user
   :buffer-name (format nil "*~A: ~:[federation~;local~]*" login-user local)
   :api-func api-public-timeline-async
-  :params (:local local)
+  :api-params (:local local)
   :entity-type :status)
 
 (define-tl tl-notifications (login-user)
